@@ -8,7 +8,7 @@ import { Loader2 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { TTSProvider, TTSState, TTSSettings } from '../types/tts';
-import { synthesizeOpenAI, synthesizeSystem, getSystemVoices } from '../services/tts';
+import { synthesizeOpenAI, synthesizeSystem } from '../services/tts';
 import { loadSettings } from '../services/storage';
 
 export function TTSPanel() {
@@ -21,18 +21,13 @@ export function TTSPanel() {
     audioUrl: null,
     autoPlay: true,
   });
-  const [settings, setSettings] = useState<TTSSettings>(loadSettings());
-  const [systemVoices, setSystemVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [settings] = useState<TTSSettings>(loadSettings());
   const { toast } = useToast();
   const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
-    getSystemVoices().then(setSystemVoices);
-  }, []);
-
-  useEffect(() => {
     if (state.audioUrl && state.autoPlay && audioRef.current) {
-      audioRef.current.play().catch(error => {
+      audioRef.current.play().catch(() => {
         toast({
           title: '错误',
           description: '自动播放失败，请手动点击播放',
@@ -40,7 +35,7 @@ export function TTSPanel() {
         });
       });
     }
-  }, [state.audioUrl, state.autoPlay]);
+  }, [state.audioUrl, state.autoPlay, toast]);
 
   const handleSubmit = async () => {
     if (!text.trim()) {

@@ -13,7 +13,6 @@ export async function synthesizeOpenAI(text: string, config: TTSConfig): Promise
       input: text,
       voice: config.voice || 'alloy',
     }),
-    redirect: 'follow',
   });
 
   if (!response.ok) {
@@ -37,7 +36,7 @@ export function synthesizeSystem(text: string, config: TTSConfig): Promise<Speec
     }
 
     utterance.onend = () => resolve(utterance);
-    utterance.onerror = (event) => reject(new Error('系统 TTS 合成失败'));
+    utterance.onerror = () => reject(new Error('系统 TTS 合成失败'));
 
     window.speechSynthesis.speak(utterance);
   });
